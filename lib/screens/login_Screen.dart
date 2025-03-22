@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'auth_service.dart';
 import 'forgot_password.dart';
@@ -22,6 +24,17 @@ class _LoginScreenState extends State<LoginScreen> {
     );
 
     if (user != null) {
+      // ✅ Get FCM Token
+      String? token = await FirebaseMessaging.instance.getToken();
+
+      if (token != null) {
+        // ✅ Store FCM Token in Firestore
+        await FirebaseFirestore.instance.collection("users").doc(user.uid).update({
+          "fcmToken": token,
+        });
+      }
+
+      // ✅ Navigate to Home Screen
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (_) => NavigationBarScreen()),
@@ -31,14 +44,15 @@ class _LoginScreenState extends State<LoginScreen> {
         SnackBar(
           content: Text(
             "Email or password incorrect!",
-            style: TextStyle(color: Colors.white), // ✅ White text color
+            style: TextStyle(color: Colors.white),
           ),
-          backgroundColor: Colors.red, // ✅ Red background
-          behavior: SnackBarBehavior.floating, // (Optional) Makes it float
+          backgroundColor: Colors.red,
+          behavior: SnackBarBehavior.floating,
         ),
       );
     }
   }
+
 
 
   @override

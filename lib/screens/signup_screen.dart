@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'auth_service.dart';
 import 'navigation_bar.dart';
@@ -14,6 +16,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
   final TextEditingController usernameController = TextEditingController();
   final AuthService authService = AuthService();
 
+
   void registerUser() async {
     User? user = await authService.signUp(
       emailController.text,
@@ -22,24 +25,38 @@ class _SignUpScreenState extends State<SignUpScreen> {
     );
 
     if (user != null) {
+      // Get the FCM token
+      String? token = await FirebaseMessaging.instance.getToken();
+
+      // Store user details + FCM token in Firestore
+      if (token != null) {
+        await FirebaseFirestore.instance.collection("users").doc(user.uid).set({
+          "username": usernameController.text,
+          "email": emailController.text,
+          "fcmToken": token,
+        });
+        print("FCM Token stored: $token");
+      }
+
+      // Navigate to home screen
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (_) => NavigationBarScreen()),
       );
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-
         SnackBar(
           content: Text(
             "Sign Up Failed!",
-            style: TextStyle(color: Colors.white), // ✅ White text color
+            style: TextStyle(color: Colors.white),
           ),
-          backgroundColor: Colors.red, // ✅ Red background
-          behavior: SnackBarBehavior.floating, // (Optional) Makes it float
+          backgroundColor: Colors.red,
+          behavior: SnackBarBehavior.floating,
         ),
       );
     }
   }
+
 
   @override
   Widget build(BuildContext context) {

@@ -53,15 +53,6 @@ class AllChatScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // appBar: AppBar(
-      //   title: Text("Chats"),
-      //   actions: [
-      //     IconButton(
-      //       icon: Icon(Icons.logout, color: Colors.black),
-      //       onPressed: () => _logout(context),
-      //     ),
-      //   ],
-      // ),
 
       appBar: AppBar(
         title: Text("Chats"),
